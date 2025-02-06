@@ -1,0 +1,210 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+// Class representing a Car
+class Car {
+    private String licensePlate;
+    private String model;
+    private boolean isRented;
+
+    public Car(String licensePlate, String model) {
+        this.licensePlate = licensePlate;
+        this.model = model;
+        this.isRented = false;
+    }
+
+    public String getLicensePlate() {
+        return licensePlate;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public boolean isRented() {
+        return isRented;
+    }
+
+    public void rentCar() {
+        if (!isRented) {
+            isRented = true;
+        } else {
+            throw new IllegalStateException("Car is already rented.");
+        }
+    }
+
+    public void returnCar() {
+        if (isRented) {
+            isRented = false;
+        } else {
+            throw new IllegalStateException("Car is not rented.");
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Car{" +
+                "licensePlate='" + licensePlate + '\'' +
+                ", model='" + model + '\'' +
+                ", isRented=" + isRented +
+                '}';
+    }
+}
+
+// Class representing a Customer
+class Customer {
+    private String customerId;
+    private String name;
+
+    public Customer(String customerId, String name) {
+        this.customerId = customerId;
+        this.name = name;
+    }
+
+    public String getCustomerId() {
+        return customerId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String toString() {
+        return "Customer{" +
+                "customerId='" + customerId + '\'' +
+                ", name='" + name + '\'' +
+                '}';
+    }
+}
+
+// Class representing a Rental Transaction
+class RentalTransaction {
+    private Car car;
+    private Customer customer;
+    private String rentalDate;
+
+    public RentalTransaction(Car car, Customer customer, String rentalDate) {
+        this.car = car;
+        this.customer = customer;
+        this.rentalDate = rentalDate;
+    }
+
+    public Car getCar() {
+        return car;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public String getRentalDate() {
+        return rentalDate;
+    }
+
+    @Override
+    public String toString() {
+        return "RentalTransaction{" +
+                "car=" + car +
+                ", customer=" + customer +
+                ", rentalDate='" + rentalDate + '\'' +
+                '}';
+    }
+}
+
+// Class representing the Rental Agency
+class RentalAgency {
+    private Map<String, Car> cars;
+    private Map<String, Customer> customers;
+    private List<RentalTransaction> transactions;
+
+    public RentalAgency() {
+        cars = new HashMap<>();
+        customers = new HashMap<>();
+        transactions = new ArrayList<>();
+    }
+
+    public void addCar(Car car) {
+        cars.put(car.getLicensePlate(), car);
+    }
+
+    public void addCustomer(Customer customer) {
+        customers.put(customer.getCustomerId(), customer);
+    }
+
+    public Car findCarByLicensePlate(String licensePlate) {
+        return cars.get(licensePlate);
+    }
+
+    public Customer findCustomerById(String customerId) {
+        return customers.get(customerId);
+    }
+
+    public void rentCar(String licensePlate, String customerId, String rentalDate) {
+        Car car = findCarByLicensePlate(licensePlate);
+        Customer customer = findCustomerById(customerId);
+
+        if (car == null) {
+            throw new IllegalArgumentException("Car not found.");
+        } else if (customer == null) {
+            throw new IllegalArgumentException("Customer not found.");
+        } else if (car.isRented()) {
+            throw new IllegalStateException("Car is already rented.");
+        }
+
+        car.rentCar();
+        RentalTransaction transaction = new RentalTransaction(car, customer, rentalDate);
+        transactions.add(transaction);
+    }
+
+    public void returnCar(String licensePlate) {
+        Car car = findCarByLicensePlate(licensePlate);
+
+        if (car == null) {
+            throw new IllegalArgumentException("Car not found.");
+        } else if (!car.isRented()) {
+            throw new IllegalStateException("Car is not rented.");
+        }
+
+        car.returnCar();
+    }
+
+    public List<RentalTransaction> getTransactions() {
+        return transactions;
+    }
+}
+
+// Test class to validate the functionality
+public class CarRentalSystem {
+    public static void main(String[] args) {
+        RentalAgency agency = new RentalAgency();
+
+        // Add cars to the agency
+        Car car1 = new Car("ABC123", "Toyota Corolla");
+        Car car2 = new Car("XYZ789", "Honda Civic");
+        agency.addCar(car1);
+        agency.addCar(car2);
+
+        // Add customers to the agency
+        Customer customer1 = new Customer("C001", "John Doe");
+        Customer customer2 = new Customer("C002", "Jane Smith");
+        agency.addCustomer(customer1);
+        agency.addCustomer(customer2);
+
+        // Rent a car
+        agency.rentCar("ABC123", "C001", "2025-02-06");
+
+        // Print transactions
+        for (RentalTransaction transaction : agency.getTransactions()) {
+            System.out.println(transaction);
+        }
+
+        // Return a car
+        agency.returnCar("ABC123");
+
+        // Print car status
+        System.out.println(agency.findCarByLicensePlate("ABC123"));
+    }
+}
