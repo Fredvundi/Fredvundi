@@ -1,0 +1,43 @@
+import java.io.Console;
+
+public class LoginProgram {
+    private static final String CORRECT_USERNAME = "Fredvundi";
+    private static final String CORRECT_PASSWORD = "securepassword";
+
+    public static void main(String[] args) {
+        Console console = System.console();
+        if (console == null) {
+            System.err.println("No console available");
+            System.exit(1);
+        }
+
+        for (int attempts = 0; attempts < 3; attempts++) {
+            // Prompt for username
+            String username = console.readLine("Enter username: ");
+            // Prompt for password
+            char[] passwordArray = console.readPassword("Enter password: ");
+            String password = new String(passwordArray);
+
+            // Check credentials
+            if (authenticate(username, password)) {
+                System.out.println("Login successful!");
+                return;
+            } else {
+                System.out.println("Incorrect username or password. Try again.");
+            }
+        }
+        System.out.println("Too many failed attempts. Exiting.");
+    }
+
+    /**
+     * Authenticates the user by checking the entered username and password
+     * against the correct credentials.
+     *
+     * @param username The entered username
+     * @param password The entered password
+     * @return true if the credentials are correct, false otherwise
+     */
+    private static boolean authenticate(String username, String password) {
+        return CORRECT_USERNAME.equals(username) && CORRECT_PASSWORD.equals(password);
+    }
+}
